@@ -1,8 +1,8 @@
-# NLP-DL  
+# nlp-dl  
 Applying deep learning to natural language processing.  
    
 ## Directory Structure  
--- NLP-DL  
+-- nlp-dl  
 ---- CONFIG.json --> config file for this project structure  
 ---- data  
 ------ project_name  
