@@ -5,7 +5,7 @@
 
 # Import packages
 
-# In[4]:
+# In[2]:
 
 
 from sklearn.model_selection import train_test_split
@@ -22,6 +22,7 @@ import pandas as pd
 import numpy as np
 import json
 import nltk
+from nltk.stem import WordNetLemmatizer
 import os
 import re
 NUM_CLASSES=6
@@ -29,6 +30,8 @@ NUM_FC1 = 800
 NUM_FC2 = 600
 MAX_COMMENT_LENGTH = 1000
 FEATUR_VECTOR_LENGTH = 1000
+LABELS = ["toxic","severe_toxic","obscene","threat","insult","identity_hate"]
+PROJ_NAME = "CNN_TOXIC"
 
 
 # Print env stats
@@ -47,8 +50,8 @@ print("CPUs:", mp.cpu_count())
 
 with open("/Users/abpwrs/NLP-DL/config.json", "rb") as f:
     config = json.load(f) # load config
-data_dir = config["data_dir"]
-model_dir = config["model_dir"]
+data_dir = os.path.join(config["data_dir"],PROJ_NAME)
+model_dir = os.path.join(config["model_dir"],PROJ_NAME)
 with open(os.path.join(data_dir,"stopwords.txt"), "r") as f:
     stopwords = f.readlines() # load stopwords                              
 stopwords = set([i.split()[0] for i in stopwords]) # remove new line characters (\n) from strings
@@ -70,9 +73,30 @@ df = pd.read_csv(os.path.join(data_dir, "train.csv"))
 # In[56]:
 
 
-# augment comments
-bad_df = df.loc[(df['toxic'] == 1) | (df['severe_toxic'] == 1) | (df['obscene'] == 1) | (df['threat'] == 1) | (df['insult'] == 1) | (df['identity_hate'] == 1)]
-df = df.append(bad_df).append(bad_df)
+def adjust_class_balance(df: pd.DataFrame, interested_labels, thresh):
+    dfs = {}
+    null = df.copy()
+    for name in interested_labels:
+        dfs[name] = df.loc[(df[name] == 1)]
+        null.drop(null[null[name]==1].index,axis=0,inplace=True)
+        
+    print("NULL:", 100*(len(null)/len(df)))
+    for name, d in dfs.items():
+        print("Initial percentage of DF for", name, "is", 100*(len(d)/len(df)))
+    
+    print("Each label will now have at least", thresh*100,"% of the origional df size")
+    adjusted_df = null.sample(int(thresh*len(df))) # get a subsample of null cases
+    
+
+    for n, d in dfs.items():
+        i=0
+        for times in range(math.ceil((thresh/(len(d)/len(df))+1))):
+            adjusted_df = adjusted_df.append(d)
+            i+=1
+        print(n,"upsampled",i,"times")
+    return adjusted_df
+
+df = adjust_class_balance(df, LABELS, 1/(len(LABELS)+1))
 
 
 # In[36]:
@@ -99,8 +123,9 @@ def clean_comment(string):
 # In[37]:
 
 
+lemmatizer = WordNetLemmatizer()
 # CODE TO GENERATE CLEANED COMMENTS
-cleaned = [[x for x in nltk.word_tokenize(clean_comment(comment)) if x.isalpha() and not x in stopwords] for comment in df["comment_text"]]
+cleaned = [[lemmatizer.lemmatize(x) for x in nltk.word_tokenize(clean_comment(comment)) if x.isalpha() and not x in stopwords] for comment in df["comment_text"]]
 np.save(os.path.join(data_dir, "cleaned.npy"), cleaned)
 # CODE TO LOAD CLEANED COMMENTS FROM FILE
 # cleaned = np.load(os.path.join(data_dir, "cleaned.npy"))
@@ -232,4 +257,22 @@ for index in range(NUM_CLASSES):
 pp(result)
 with open(os.path.join(data_dir, "confusion.pkl"), "wb") as f:
     json.dump(result,f)
+
+
+# In[ ]:
+
+
+
+
+
+# In[ ]:
+
+
+
+
+
+# In[ ]:
+
+
+
 
