@@ -106,3 +106,4 @@ venv.bak/
 # ignore IDE ENVS
 .vscode/
 .idea/
+.DS_Store
