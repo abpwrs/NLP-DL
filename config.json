@@ -1,6 +1,6 @@
 {
-    "data_dir": "/Users/AlexPowers/code/nlp-dl/data",
-    "model_dir": "/Users/AlexPowers/code/nlp-dl/model",
-    "out_dir": "/Users/AlexPowers/code/nlp-dl/out",
-    "job_dir": "/Users/AlexPowers/code/nlp-dl/job"
+    "data_dir": "/Users/abpwrs/nlp-dl/data",
+    "model_dir": "/Users/abpwrs/nlp-dl/model",
+    "out_dir": "/Users/abpwrs/nlp-dl/out",
+    "job_dir": "/Users/abpwrs/nlp-dl/job"
 }

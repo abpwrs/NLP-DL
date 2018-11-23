@@ -1,0 +1,2 @@
+model_checkpoint_path: "/Users/abpwrs/nlp-dl/model/BRNN_TOXIC/IE_CNN_WEIGHTS"
+all_model_checkpoint_paths: "/Users/abpwrs/nlp-dl/model/BRNN_TOXIC/IE_CNN_WEIGHTS"
